@@ -11,7 +11,7 @@ IMG_DATA/**
 .DS_Store            # Fichier spécifique à macOS
 Thumbs.db            # Fichier spécifique à Windows
 *.log                # Exclure les fichiers de log
-
+*.csv
 # Exclure les environnements Python
 __pycache__/
 *.pyc
