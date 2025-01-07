@@ -1,0 +1,29 @@
+# Exclure le dossier IMG_DATA et tout son contenu
+IMG_DATA/
+
+# Exclure également des sous-dossiers spécifiques dans IMG_DATA, si nécessaire
+IMG_DATA/**
+
+# Exclusions globales souvent utiles
+*.jp2                # Exclure tous les fichiers .jp2 (optionnel)
+*.csv                # Exclure les fichiers CSV (ajustez selon vos besoins)
+*.zip                # Exclure les archives ZIP
+.DS_Store            # Fichier spécifique à macOS
+Thumbs.db            # Fichier spécifique à Windows
+*.log                # Exclure les fichiers de log
+
+# Exclure les environnements Python
+__pycache__/
+*.pyc
+*.pyo
+.env                 # Fichier d'environnement (Python)
+
+# Exclure les outils et IDE
+.vscode/             # Paramètres Visual Studio Code
+.idea/               # Paramètres PyCharm/IntelliJ IDEA
+*.iml                # Fichiers de projet IDEA
+
+# Exclure les sauvegardes temporaires
+*.bak
+*.tmp
+~$*
