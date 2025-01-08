@@ -12,18 +12,29 @@ IMG_DATA/**
 Thumbs.db            # Fichier spécifique à Windows
 *.log                # Exclure les fichiers de log
 *.csv
+*.bak                # Sauvegardes temporaires
+*.tmp
+~$*                  # Fichiers temporaires spécifiques
+
 # Exclure les environnements Python
 __pycache__/
 *.pyc
 *.pyo
-.env                 # Fichier d'environnement (Python)
+*.env
+env/                 # Dossier d'environnement Python (nom par défaut)
+venv/                # Environnement virtuel Python
+env_streamlit_agriculture/ # Environnement spécifique à ce projet
 
 # Exclure les outils et IDE
 .vscode/             # Paramètres Visual Studio Code
 .idea/               # Paramètres PyCharm/IntelliJ IDEA
 *.iml                # Fichiers de projet IDEA
 
-# Exclure les sauvegardes temporaires
+# Exclure les sauvegardes et fichiers temporaires
 *.bak
 *.tmp
 ~$*
+
+# Exclure les fichiers spécifiques à certains systèmes d'exploitation
+.DS_Store            # macOS
+Thumbs.db            # Windows
