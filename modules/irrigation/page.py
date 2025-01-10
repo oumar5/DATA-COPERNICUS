@@ -10,7 +10,6 @@ from .service import (
     predict_conditions,
     predict_future_climate,
     generate_recommendation,
-    predict_future_climate_with_gp
 )
 from .components import display_climate_indices, display_recommendation
 
@@ -114,7 +113,11 @@ def show():
         recommendations = []
         for idx, (temp, precip, indices) in enumerate(zip(temp_values, precip_values, indices_list)):
             rec = generate_recommendation(soil_info, indices, temp, precip, culture_info)
-            recommendations.append(f"Jour {idx + 1} : {rec}")
+            recommendations.append(rec)
 
-        display_climate_indices(indices_list, time_labels, temp_values, precip_values)
-        display_recommendation("\n".join(recommendations))
+        # Extraire les besoins quotidiens en eau à partir des recommandations
+        daily_water_needs = [rec['daily_need_l_per_m2'] for rec in recommendations]
+
+        # Appel de la fonction avec les besoins quotidiens
+        display_climate_indices(indices_list, time_labels, temp_values, precip_values, daily_water_needs)
+        display_recommendation(recommendations)

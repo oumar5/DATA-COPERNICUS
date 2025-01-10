@@ -1,10 +1,9 @@
 import requests
 from datetime import datetime, timedelta
 import numpy as np
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.multioutput import MultiOutputRegressor
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+
 # URL de base pour l'API NASA POWER
 BASE_URLS = {
     "nasa_power": "https://power.larc.nasa.gov/api/temporal/daily/point"
@@ -96,7 +95,7 @@ def train_multioutput_prediction_model(lat, lon):
     - lon (float) : Longitude du lieu.
 
     Retourne :
-    - Un modèle MultiOutputRegressor entraîné.
+    - Un modèle MultiOutputRegressor basé sur RandomForestRegressor.
     """
     # Déterminer la période d'entraînement : les 2 dernières années
     today = datetime.today()
@@ -122,15 +121,14 @@ def train_multioutput_prediction_model(lat, lon):
     X = np.arange(len(temps)).reshape(-1, 1)  # Index des jours comme variable explicative
     y = np.column_stack((temps, precips))  # Variables cibles : (température, précipitation)
 
-    # Création du modèle multi-sorties basé sur une régression linéaire
-    base_model = LinearRegression()
+    # Création du modèle multi-sorties basé sur Random Forest
+    base_model = RandomForestRegressor(n_estimators=100, random_state=42)
     multi_model = MultiOutputRegressor(base_model)
 
     # Entraînement du modèle
     multi_model.fit(X, y)
 
     return multi_model
-
 
 def predict_conditions(model, day_index):
     """
@@ -151,7 +149,7 @@ def predict_conditions(model, day_index):
 
 def generate_recommendation(soil_info, indices, temp_pred, precip_pred, culture_info):
     """
-    Génère une recommandation d'irrigation basée sur les données climatiques, le sol et les besoins culturaux.
+    Génère une recommandation d'irrigation structurée en litres/m² sous forme de dictionnaire.
 
     - soil_info (dict) : Informations sur le sol (composition, pH, etc.).
     - indices (dict) : Contient 'soil_moisture' et 'vegetation_index'.
@@ -160,21 +158,37 @@ def generate_recommendation(soil_info, indices, temp_pred, precip_pred, culture_
     - culture_info (dict) : Besoins en eau de la culture.
 
     Retourne :
-    - Une chaîne de caractères contenant la recommandation.
+    - Un dictionnaire contenant les recommandations structurées.
     """
     soil_moisture = indices["soil_moisture"]  # Humidité du sol calculée
-    daily_need = culture_info["besoin_eau_semaine"] / 7  # Besoin journalier en eau
+    daily_need_mm = culture_info["besoin_eau_semaine"] / 7  # Besoin journalier en mm/jour
+    daily_need_l_per_m2 = daily_need_mm  # Conversion directe mm -> litres/m²
 
-    recommendation = f"Sol : {soil_info['composition']} (pH={soil_info['pH']}).\n"
-    recommendation += f"Prévisions météo -> Température : {temp_pred:.1f}°C, Pluie : {precip_pred:.1f} mm.\n"
-
-    if precip_pred < daily_need:  # Précipitations insuffisantes
-        manque = daily_need - precip_pred
-        recommendation += f"- Précipitations insuffisantes, ajoutez ~{manque:.2f} mm/jour d'arrosage.\n"
+    # Calcul des besoins supplémentaires en irrigation
+    if precip_pred < daily_need_mm:  # Précipitations insuffisantes
+        manque_mm = daily_need_mm - precip_pred  # Besoin supplémentaire en mm
+        manque_l_per_m2 = manque_mm  # Conversion mm -> litres/m²
+        irrigation_message = f"Précipitations insuffisantes, ajoutez ~{manque_l_per_m2:.2f} L/m²/jour."
     elif soil_moisture > culture_info["soil_moisture_optimal"]:  # Sol déjà humide
-        recommendation += "- Humidité du sol élevée, réduisez l'irrigation.\n"
+        irrigation_message = "Humidité du sol élevée, réduisez l'irrigation."
     else:  # Cas général
-        recommendation += "- Ajustez l'irrigation en fonction des conditions actuelles.\n"
+        irrigation_message = "Ajustez l'irrigation en fonction des conditions actuelles."
+
+    # Construire le dictionnaire de recommandation
+    recommendation = {
+        "soil_info": {
+            "composition": soil_info["composition"],
+            "pH": soil_info["pH"],
+            "type": soil_info["type"]
+        },
+        "weather_forecast": {
+            "temperature": round(temp_pred, 1),
+            "precipitation": round(precip_pred, 1)
+        },
+        "daily_need_l_per_m2": round(daily_need_l_per_m2, 2),
+        "soil_moisture": round(soil_moisture, 2),
+        "irrigation_message": irrigation_message
+    }
 
     return recommendation
 
