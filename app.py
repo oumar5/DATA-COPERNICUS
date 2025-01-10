@@ -8,7 +8,7 @@ from modules.climatic_analysis.page import show as show_climatic_analysis
 st.sidebar.title("Navigation")
 page = st.sidebar.radio(
     "Aller à :",
-    ["Accueil", "Surveillance des sols", "Recommandations d'irrigation", "Analyse climatique", "À propos"]
+    ["Accueil", "Analyse climatique","Surveillance des sols", "Recommandations d'irrigation",  "À propos"]
 )
 
 # Charger les pages en fonction de la sélection

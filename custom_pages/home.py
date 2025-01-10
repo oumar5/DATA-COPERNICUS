@@ -4,22 +4,23 @@ def show():
     """
     Affiche la page d'accueil de l'application.
     """
-    st.title("Gestion de l'eau en agriculture 🌍")
+    st.title("Bienvenue sur HydroSense 🌍")
 
     st.markdown("""
-        ## Bienvenue sur l'application de gestion de l'eau !
+        ### Gérez efficacement l'eau en agriculture !
+        HydroSense est une application innovante qui vous accompagne dans la gestion de l'eau pour une agriculture durable.
 
-        Cette application vise à optimiser la gestion de l'eau en agriculture à l'aide :
-        - Des données satellitaires (Sentinel, OneSoil),
-        - Des données météorologiques en temps réel (OpenWeatherMap),
-        - D'outils d'analyse avancés.
+        Grâce à l'analyse des données climatiques, cette application vous offre :
+        - Une surveillance précise des conditions de sol.
+        - Des recommandations personnalisées d'irrigation.
+        - Une analyse climatique simplifiée pour anticiper vos besoins.
 
-        ### Fonctionnalités principales :
-        - **Surveillance des sols** : Obtenez des informations sur l'humidité des sols.
-        - **Recommandations d'irrigation** : Recevez des recommandations basées sur les prévisions météorologiques.
-        - **Analyse climatique** : Analysez les conditions climatiques actuelles et futures.
+        #### Pourquoi utiliser HydroSense ?
+        - **Précision** : Les recommandations s'appuient sur des données climatiques fiables.
+        - **Simplicité** : Une interface intuitive pour un accès rapide à l'information.
+        - **Durabilité** : Aidez à préserver les ressources en eau en optimisant leur utilisation.
 
-        **Naviguez dans l'application en utilisant le menu à gauche !**
+        **Utilisez le menu à gauche pour naviguer dans les différentes fonctionnalités de l'application.** 🌱
     """)
 
-    st.info("Astuce : Utilisez la barre latérale pour explorer les différentes sections.")
+    st.info("Astuce : Consultez les recommandations quotidiennes pour planifier votre irrigation efficacement.")

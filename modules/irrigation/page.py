@@ -41,20 +41,54 @@ def set_green_theme():
     )
 
 
-def load_culture_info():
+def load_culture_info(fruit_type):
     """
-    Charge des informations statiques sur la culture à analyser.
+    Charge des informations statiques sur la culture à analyser en fonction du fruit sélectionné.
     """
-    return {
-        "nom": "Pommier",
-        "temp_optimal_min": 15,
-        "temp_optimal_max": 25,
-        "besoin_eau_semaine": 20,  # Besoin d'eau en mm par semaine
-        "type_sol_prefere": "Loameux",
-        "ph_optimal_min": 6.0,
-        "ph_optimal_max": 7.0,
-        "soil_moisture_optimal": 15  # Humidité du sol en mm
-    }
+    if fruit_type == "Pommier":
+        return {
+            "nom": "Pommier",
+            "temp_optimal_min": 15,
+            "temp_optimal_max": 25,
+            "besoin_eau_semaine": 20,  # Besoin d'eau en mm par semaine
+            "type_sol_prefere": "Loameux",
+            "ph_optimal_min": 6.0,
+            "ph_optimal_max": 7.0,
+            "soil_moisture_optimal": 15  # Humidité du sol en mm
+        }
+    elif fruit_type == "Poiriers":
+        return {
+            "nom": "Poiriers",
+            "temp_optimal_min": 14,
+            "temp_optimal_max": 24,
+            "besoin_eau_semaine": 18,
+            "type_sol_prefere": "Argileux",
+            "ph_optimal_min": 6.0,
+            "ph_optimal_max": 7.5,
+            "soil_moisture_optimal": 14
+        }
+    elif fruit_type == "Cerisiers":
+        return {
+            "nom": "Cerisiers",
+            "temp_optimal_min": 16,
+            "temp_optimal_max": 26,
+            "besoin_eau_semaine": 22,
+            "type_sol_prefere": "Sableux",
+            "ph_optimal_min": 5.5,
+            "ph_optimal_max": 6.5,
+            "soil_moisture_optimal": 13
+        }
+    else:  # Autre ou valeurs par défaut
+        return {
+            "nom": fruit_type,
+            "temp_optimal_min": 15,
+            "temp_optimal_max": 25,
+            "besoin_eau_semaine": 20,
+            "type_sol_prefere": "Loameux",
+            "ph_optimal_min": 6.0,
+            "ph_optimal_max": 7.0,
+            "soil_moisture_optimal": 15
+        }
 
 
 def show():
@@ -64,6 +98,12 @@ def show():
     set_green_theme()
     st.title("Indice de Végétation et Humidité du Sol")
     st.write("Analyse climatique pour une région donnée.")
+
+    # Ajout du sélecteur de fruit
+    fruit_choice = st.selectbox(
+        "Sélectionnez un fruit",
+        ["Pommier", "Poiriers", "Cerisiers", "Autre"]
+    )
 
     st.info("Les coordonnées par défaut sont centrées sur la région Auvergne-Rhône-Alpes.")
     lat = st.number_input("Latitude", value=45.764043, format="%.6f")
@@ -107,7 +147,7 @@ def show():
         time_labels = [(start_date + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(num_days)]
 
         indices_list = calculate_indices(temp_values, precip_values)
-        culture_info = load_culture_info()
+        culture_info = load_culture_info(fruit_choice)  # Utilisation du fruit sélectionné
         soil_info = get_soil_info(lat, lon)
 
         recommendations = []

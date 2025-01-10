@@ -7,21 +7,29 @@ def show():
     st.title("À propos du projet 📖")
 
     st.markdown("""
-        ### Objectif du projet :
-        Ce projet a été conçu pour aider les agriculteurs et les gestionnaires à optimiser l'usage de l'eau en utilisant des outils numériques et des données géospatiales.
+        ### Contexte et Objectif :
+        HydroSense est conçu pour aider les agriculteurs à gérer efficacement l'eau en combinant des données climatiques fiables et des outils d'analyse avancés. 
 
-        ### Technologies utilisées :
-        - **Streamlit** pour l'interface utilisateur.
-        - **APIs** : OpenWeatherMap, OneSoil, Google Earth Engine.
-        - **Bibliothèques Python** : Pandas, Plotly, Requests.
+        ### Technologies Utilisées :
+        - **API Climatique** : [NASA POWER](https://power.larc.nasa.gov/api/temporal/hourly/point) pour récupérer les données de température et de précipitations.
+        - **Calculs Dynamiques** : 
+          - Indices comme l'humidité du sol et des approximations de l'état de la végétation basés uniquement sur les données climatiques.
+        - **Outils de Développement** : 
+          - **Streamlit** pour l'interface utilisateur.
+          - **Pandas**, **NumPy**, **Matplotlib** pour l'analyse et la visualisation.
 
-        ### Développeurs :
-        - **Votre Nom** : Développement et intégration des fonctionnalités.
-        - **Votre Équipe** : Contribution à l'analyse et à la conception.
+        ### Membres de l'Équipe :
+        - **Oumar Ben Lol**
+        - **EFOE Étienne Blavo**
+        - **Armel Cyrille Boti**
+        - **Ivan Joe Sobgui**
+        - **Divengi Nagui**
+        - **Sghiouri Mohammed**
 
-        ### Contact :
-        - **Email** : votre.email@example.com
-        - **Téléphone** : +33 6 12 34 56 78
+        ### Applications Clés :
+        - **Optimisation de l'Irrigation** : Réduire la consommation d'eau tout en maximisant les rendements agricoles.
+        - **Analyse Climatique** : Anticiper les besoins en eau à partir des données météorologiques.
 
-        Merci d'utiliser cette application ! 🚀
+
+        Merci d'utiliser HydroSense pour une agriculture durable et responsable ! 🌱
     """)
