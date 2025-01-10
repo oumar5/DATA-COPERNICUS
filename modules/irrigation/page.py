@@ -1,32 +1,120 @@
 import streamlit as st
-import folium
-from streamlit_folium import st_folium
-from .service import get_irrigation_recommendations
-from .components import display_irrigation_recommendations
+from datetime import datetime, timedelta
+
+# Import des modules locaux
+from .service import (
+    get_climate_data,
+    calculate_indices,
+    get_soil_info,
+    train_multioutput_prediction_model,
+    predict_conditions,
+    predict_future_climate,
+    generate_recommendation,
+    predict_future_climate_with_gp
+)
+from .components import display_climate_indices, display_recommendation
+
+
+def set_green_theme():
+    """
+    Applique un thème vert à l'application Streamlit.
+    """
+    st.markdown(
+        """
+        <style>
+        .reportview-container {
+            background-color: #eaffea;
+        }
+        .stButton>button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+        }
+        .stTextInput>div>div>input {
+            background-color: #f0fff0;
+            color: black;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+def load_culture_info():
+    """
+    Charge des informations statiques sur la culture à analyser.
+    """
+    return {
+        "nom": "Pommier",
+        "temp_optimal_min": 15,
+        "temp_optimal_max": 25,
+        "besoin_eau_semaine": 20,  # Besoin d'eau en mm par semaine
+        "type_sol_prefere": "Loameux",
+        "ph_optimal_min": 6.0,
+        "ph_optimal_max": 7.0,
+        "soil_moisture_optimal": 15  # Humidité du sol en mm
+    }
+
 
 def show():
     """
-    Affiche la page de recommandations d'irrigation avec Folium.
+    Affiche la page principale pour calculer les indices et les recommandations.
     """
-    st.title("Recommandations d'irrigation")
-    
-    st.write("Sélectionnez un point sur la carte.")
-    
-    # Créer une carte centrée sur la France
-    m = folium.Map(location=[46.603354, 1.888334], zoom_start=6)
-    
-    # Ajouter un marqueur initial
-    marker = folium.Marker([46.603354, 1.888334], popup="France - Déplacez-moi", draggable=True)
-    marker.add_to(m)
+    set_green_theme()
+    st.title("Indice de Végétation et Humidité du Sol")
+    st.write("Analyse climatique pour une région donnée.")
 
-    # Afficher la carte interactive dans Streamlit
-    st_data = st_folium(m, width=700, height=500)
-    
-    # Récupérer les coordonnées du marqueur
-    if st_data and "last_object_clicked" in st_data:
-        lat, lon = st_data["last_object_clicked"]["lat"], st_data["last_object_clicked"]["lng"]
-        st.write(f"Coordonnées sélectionnées : Latitude = {lat}, Longitude = {lon}")
+    st.info("Les coordonnées par défaut sont centrées sur la région Auvergne-Rhône-Alpes.")
+    lat = st.number_input("Latitude", value=45.764043, format="%.6f")
+    lon = st.number_input("Longitude", value=4.835659, format="%.6f")
 
-        # Appeler le service pour obtenir des recommandations
-        irrigation_data = get_irrigation_recommendations(lat, lon)
-        display_irrigation_recommendations(irrigation_data)
+    today = datetime.today()
+    date_range = st.date_input(
+        "Sélectionnez la période (dates futures uniquement)",
+        value=(today + timedelta(days=1), today + timedelta(days=30)),
+        min_value=today,
+        max_value=datetime(today.year + 10, today.month, today.day),
+    )
+
+    if isinstance(date_range, tuple) and len(date_range) == 2:
+        start_date, end_date = date_range
+        num_days = (end_date - start_date).days + 1  # Calcul du nombre de jours dans la plage
+    else:
+        st.error("Veuillez sélectionner une plage de dates valide.")
+        st.stop()
+
+    if st.button("Calculer les indices"):
+        with st.spinner("Entraînement du modèle..."):
+            try:
+                model = train_multioutput_prediction_model(lat, lon)
+                st.success("Modèle entraîné avec succès.")
+            except ValueError as ve:
+                st.error(str(ve))
+                st.stop()
+
+        with st.spinner("Prédiction des données climatiques futures..."):
+            try:
+                future_climate_data = predict_future_climate(model, num_days)
+                st.success("Prédictions climatiques générées avec succès.")
+            except Exception as e:
+                st.error(f"Erreur lors de la prédiction : {str(e)}")
+                st.stop()
+
+        # Extraire les prévisions
+        temp_values = [day["temp"] for day in future_climate_data]
+        precip_values = [day["precip"] for day in future_climate_data]
+        time_labels = [(start_date + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(num_days)]
+
+        indices_list = calculate_indices(temp_values, precip_values)
+        culture_info = load_culture_info()
+        soil_info = get_soil_info(lat, lon)
+
+        recommendations = []
+        for idx, (temp, precip, indices) in enumerate(zip(temp_values, precip_values, indices_list)):
+            rec = generate_recommendation(soil_info, indices, temp, precip, culture_info)
+            recommendations.append(f"Jour {idx + 1} : {rec}")
+
+        display_climate_indices(indices_list, time_labels, temp_values, precip_values)
+        display_recommendation("\n".join(recommendations))

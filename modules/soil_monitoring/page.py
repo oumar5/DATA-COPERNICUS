@@ -70,13 +70,3 @@ def show():
             st.warning("Aucune donnée disponible pour ces coordonnées et ces dates.")
             return
 
-        try:
-            temp_values = list(parameters["T2M"].values())
-            precip_values = list(parameters["PRECTOTCORR"].values())
-            time_labels = list(parameters["T2M"].keys())
-
-            indices_list = calculate_indices(temp_values, precip_values)
-            display_climate_indices(indices_list, time_labels)
-
-        except KeyError as e:
-            st.error(f"Erreur de clé manquante : {str(e)}")

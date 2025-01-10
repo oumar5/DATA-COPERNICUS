@@ -26,6 +26,7 @@ def get_climate_data(lat, lon, start_date, end_date):
         "community": "ag"  # Données pour la communauté agricole
     }
     try:
+        
         response = requests.get(url, params=params)
         if response.status_code == 200:
             return response.json()
