@@ -1,7 +1,3 @@
-# import streamlit as st
-# from datetime import datetime
-# from .service import get_climate_data, calculate_indices
-# from .components import display_climate_indices
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -107,7 +103,7 @@ def show():
     """, unsafe_allow_html=True)
 
     
-    st.title("Visualisation des données sur la région Auverne-Rhône-Alpes")
+    st.title("Analyse du sol de la région Auvergne-Rhône-Alpes")
 
     # Carte pour sélectionner la zone
     m = folium.Map(location=[45.7578137, 4.8320114], zoom_start=8)
@@ -144,32 +140,26 @@ def show():
             st.write("Aucun tracé actif pour l'instant.")
             lat, lon = 45.7578137, 4.8320114
 
-    # Date sliders
+    # Date pickers
     start_reference = datetime(2024, 10, 6)  # Date de début fixe
     end_reference = datetime.now()
-    days_diff = (end_reference - start_reference).days
 
-    # Créer un slider pour sélectionner la plage de dates
+    # Créer des date pickers pour sélectionner la plage de dates
     col1, col2 = st.columns(2)
     with col1:
-        start_days = st.slider(
+        start_date = st.date_input(
             "Date de début",
-            min_value=0,
-            max_value=days_diff,
-            value=0,
-            format="J+%d"
+            value=start_reference,
+            max_value=end_reference
         )
-        start_date = start_reference + timedelta(days=start_days)
 
     with col2:
-        end_days = st.slider(
+        end_date = st.date_input(
             "Date de fin",
-            min_value=start_days,
-            max_value=days_diff,
-            value=min(start_days + 30, days_diff),
-            format="J+%d"
+            value=min(start_reference + timedelta(days=30), end_reference),
+            min_value=start_date,
+            max_value=end_reference
         )
-        end_date = start_reference + timedelta(days=end_days)
 
     # Afficher les dates sélectionnées
     st.write(f"Période sélectionnée : du {start_date.strftime('%d/%m/%Y')} au {end_date.strftime('%d/%m/%Y')}")
@@ -182,24 +172,104 @@ def show():
     # weather_data = get_weather_data(lat, lon, start_date_formatted, end_date_formatted)
     soil_data = get_soil_data(lat, lon, start_date_formatted, end_date_formatted)
 
-    _col1, _col2 = st.columns(2)
-    with _col1:
-        st.title("Dataset du Sol")
-        st.dataframe(soil_data)
-    with _col2:
-        st.title("Sommaire")
-        summary = soil_data.describe()  # Calcul des statistiques descriptives
-        st.dataframe(summary)
+    # Ajout du bouton pour afficher/masquer le dataset
+    show_dataset = st.button("Afficher/Masquer Dataset")
+    
+    # Variable de session pour suivre l'état d'affichage
+    if 'show_dataset_state' not in st.session_state:
+        st.session_state.show_dataset_state = False
+    
+    if show_dataset:
+        st.session_state.show_dataset_state = not st.session_state.show_dataset_state
 
-    col1, col2 = st.columns(2)
-    with col1:
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=soil_data['Date'], y=soil_data['Humidité du sol'], name='Humidité du sol'))
-        fig.update_layout(title='Humidité du sol', xaxis_title='Date', yaxis_title='Humidité (%)')
-        st.plotly_chart(fig)
+    if st.session_state.show_dataset_state:
+        _col1, _col2 = st.columns(2)
+        with _col1:
+            st.title("Dataset du Sol")
+            st.dataframe(soil_data)
+        with _col2:
+            st.title("Sommaire")
+            summary = soil_data.describe()  # Calcul des statistiques descriptives
+            st.dataframe(summary)
 
-    with col2:
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=soil_data['Date'], y=soil_data['VegetationIndex'], name='Indice de végétation'))
-        fig.update_layout(title='Indice de végétation', xaxis_title='Date', yaxis_title='Indice')
-        st.plotly_chart(fig)
+    # col1, col2 = st.columns(2)
+    # with col1:
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=soil_data['Date'], 
+        y=soil_data['Humidité du sol'], 
+        name='Humidité du sol'),           
+    )
+    fig.update_layout(title='Humidité du sol', xaxis_title='Date', yaxis_title='Humidité (%)')
+    st.plotly_chart(fig)
+
+    # with col2:
+     # Deuxième graphique - Indice de végétation (en vert)
+    fig2 = go.Figure()
+    fig2.add_trace(go.Scatter(
+        x=soil_data['Date'],
+        y=soil_data['VegetationIndex'],
+        name='Indice de végétation',
+        line=dict(color='#2ecc71')  # Couleur verte
+    ))
+    fig2.update_layout(
+        title='Indice de végétation',
+        xaxis_title='Date',
+        yaxis_title='Indice',
+        height=400  # Hauteur fixe pour le graphique
+    )
+    st.plotly_chart(fig2, use_container_width=True)
+    
+    # Troisième graphique - Graphique combiné avec deux axes y
+    fig3 = go.Figure()
+    
+    # Ajout des barres pour l'humidité du sol (axe y principal)
+    fig3.add_trace(go.Bar(
+        x=soil_data['Date'],
+        y=soil_data['Humidité du sol'],
+        name='Humidité du sol',
+        marker_color='#3498db',  # Bleu
+        opacity=0.7,
+        yaxis='y'
+    ))
+    
+    # Ajout des barres pour l'indice de végétation (axe y secondaire)
+    fig3.add_trace(go.Scatter(
+        x=soil_data['Date'],
+        y=soil_data['VegetationIndex'],
+        name='Indice de végétation',
+        marker_color='#2ecc71',  # Vert
+        opacity=0.7,
+        yaxis='y2'
+    ))
+    
+    # Mise en page du graphique avec deux axes y
+    fig3.update_layout(
+        title='Comparaison Humidité du sol et Indice de végétation',
+        xaxis_title='Date',
+        yaxis=dict(
+            title='Humidité du sol (%)',
+            titlefont=dict(color='#3498db'),
+            tickfont=dict(color='#3498db')
+        ),
+        yaxis2=dict(
+            title='Indice de végétation',
+            titlefont=dict(color='#2ecc71'),
+            tickfont=dict(color='#2ecc71'),
+            overlaying='y',
+            side='right'
+        ),
+        barmode='group',
+        height=400,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        # Ajuster les marges pour accommoder le deuxième axe y
+        margin=dict(r=50)
+    )
+    
+    st.plotly_chart(fig3, use_container_width=True)

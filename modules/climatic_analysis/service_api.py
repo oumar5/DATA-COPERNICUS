@@ -19,8 +19,6 @@ def get_weather_climate(lat=45.7772, long=3.0870, start="20250101", end="2025010
 
     # Envoyer la requête GET
     response = requests.get(api_url, params=params)
-    
-    print("ici c'est la repp -------------==========",response)
 
     # Vérifier si la requête a réussi
     if response.status_code == 200:

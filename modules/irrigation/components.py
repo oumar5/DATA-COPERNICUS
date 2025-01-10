@@ -76,7 +76,7 @@ def display_recommendation(recommendations):
 
     - recommendations (list): Liste des recommandations, chaque élément étant un dictionnaire structuré.
     """
-    st.markdown("<h3 style='color:#2c3e50;'>Récommandations d'Irrigation</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color:#2c3e50;'>Recommandations d'Irrigation</h3>", unsafe_allow_html=True)
 
     # Préparation des données pour le tableau
     table_data = []

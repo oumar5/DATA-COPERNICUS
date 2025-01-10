@@ -79,7 +79,7 @@ def show():
     """, unsafe_allow_html=True)
 
     
-    st.title("Visualisation des données sur la région Auverne-Rhône-Alpes")
+    st.title("Analyse climatique pour la région d'Auverne-Rhône-Alpes")
 
     # Carte pour sélectionner la zone
     m = folium.Map(location=[45.7578137, 4.8320114], zoom_start=8)
@@ -116,32 +116,26 @@ def show():
             st.write("Aucun tracé actif pour l'instant.")
             lat, lon = 45.7578137, 4.8320114
 
-    # Date sliders
+    # Date pickers
     start_reference = datetime(2024, 10, 6)  # Date de début fixe
     end_reference = datetime.now()
-    days_diff = (end_reference - start_reference).days
 
-    # Créer un slider pour sélectionner la plage de dates
+    # Créer des date pickers pour sélectionner la plage de dates
     col1, col2 = st.columns(2)
     with col1:
-        start_days = st.slider(
+        start_date = st.date_input(
             "Date de début",
-            min_value=0,
-            max_value=days_diff,
-            value=0,
-            format="J+%d"
+            value=start_reference,
+            max_value=end_reference
         )
-        start_date = start_reference + timedelta(days=start_days)
 
     with col2:
-        end_days = st.slider(
+        end_date = st.date_input(
             "Date de fin",
-            min_value=start_days,
-            max_value=days_diff,
-            value=min(start_days + 30, days_diff),
-            format="J+%d"
+            value=min(start_reference + timedelta(days=30), end_reference),
+            min_value=start_date,
+            max_value=end_reference
         )
-        end_date = start_reference + timedelta(days=end_days)
 
     # Afficher les dates sélectionnées
     st.write(f"Période sélectionnée : du {start_date.strftime('%d/%m/%Y')} au {end_date.strftime('%d/%m/%Y')}")
@@ -152,21 +146,33 @@ def show():
 
     weather_data = get_weather_data(lat, lon, start_date_formatted, end_date_formatted)
 
-    _col1, _col2 = st.columns(2)
-    with _col1:
-        st.title("Dataset Metéo")
-        st.dataframe(weather_data)
-    with _col2:
-        st.title("Sommaire Dataset")
-        summary = weather_data.describe()  # Calcul des statistiques descriptives
-        st.dataframe(summary)
+    # Ajout du bouton pour afficher/masquer le dataset
+    show_dataset = st.button("Afficher/Masquer Dataset")
+
+    # Variable de session pour suivre l'état d'affichage
+    if 'show_dataset_state' not in st.session_state:
+        st.session_state.show_dataset_state = False
+
+    if show_dataset:
+        st.session_state.show_dataset_state = not st.session_state.show_dataset_state
+
+    if st.session_state.show_dataset_state:
+        _col1, _col2 = st.columns(2)
+        with _col1:
+            st.title("Dataset Metéo")
+            st.dataframe(weather_data)
+        with _col2:
+            st.title("Sommaire Dataset")
+            summary = weather_data.describe()  # Calcul des statistiques descriptives
+            st.dataframe(summary)
 
     meteo_option = st.selectbox('Météo', ['Température', 'Précipitations'])
 
     if meteo_option == 'Température':
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=weather_data['Date'], y=weather_data['TempMax'], name='Temp Max'))
-        fig.add_trace(go.Scatter(x=weather_data['Date'], y=weather_data['TempMin'], name='Temp Min'))
+        fig.add_trace(go.Scatter(x=weather_data['Date'], y=weather_data['TempMax'], name='Temp. Max'))
+        fig.add_trace(go.Scatter(x=weather_data['Date'], y=weather_data['TempMin'], name='Temp. Min'))
+        fig.add_trace(go.Scatter(x=weather_data['Date'], y=weather_data['Temperature'], name='Temp. Moyenne'))
         fig.update_layout(title='Température', xaxis_title='Date', yaxis_title='Température (°C)')
         st.plotly_chart(fig)
     else:
@@ -174,4 +180,56 @@ def show():
         fig.add_trace(go.Bar(x=weather_data['Date'], y=weather_data['Precipitation'], name='Précipitations'))
         fig.update_layout(title='Précipitations', xaxis_title='Date', yaxis_title='Précipitations (mm)')
         st.plotly_chart(fig)
+
+    # Créer la figure
+    fig = go.Figure()
+
+    # Ajouter la trace pour la température
+    fig.add_trace(go.Scatter(
+        x=weather_data['Date'],
+        y=weather_data['Temperature'],
+        name='Temp. Moyenne',
+        line=dict(color='#3498db'),
+        mode='lines'
+    ))
+
+    # Ajouter la trace pour les précipitations
+    fig.add_trace(go.Bar(
+        x=weather_data['Date'],
+        y=weather_data['Precipitation'],
+        name='Précipitations',
+        marker_color='#2ecc71',
+        yaxis='y2'  # Associer à l'axe y secondaire
+    ))
+
+    # Mettre à jour la disposition
+    fig.update_layout(
+        title='Température & Précipitation',
+        xaxis_title='Date',
+        yaxis=dict(
+            title='Température (°C)',
+            titlefont=dict(color='#3498db'),
+            tickfont=dict(color='#3498db')
+        ),
+        yaxis2=dict(
+            title='Précipitations (mm)',
+            titlefont=dict(color='#2ecc71'),
+            tickfont=dict(color='#2ecc71'),
+            anchor='x',
+            overlaying='y',
+            side='right'
+        ),
+        barmode='group',
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        margin=dict(r=80)  # Ajuster si besoin pour afficher les étiquettes de l'axe secondaire
+    )
+
+    # Afficher le graphique dans Streamlit
+    st.plotly_chart(fig)
 

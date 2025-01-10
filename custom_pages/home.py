@@ -18,7 +18,7 @@ def show():
             Accédez à des données climatiques fiables et des analyses détaillées pour prendre les meilleures décisions.
         """)
         # Définir la taille fixe pour l'image
-        st.image("assets/image4.jpg", caption="Analyse Précise", width=400)  # Ajuster la largeur ici
+        st.image("assets/image4.jpg", caption="Analyse Précise", width=500)  # Ajuster la largeur ici
 
     # Fonctionnalité 2: Gestion Intelligente avec image
     with col2:
@@ -27,7 +27,7 @@ def show():
             Optimisez votre consommation d'eau grâce à nos recommandations personnalisées basées sur l'IA.
         """)
         # Définir la même taille fixe pour l'image
-        st.image("assets/image2.jpg", caption="Gestion Intelligente", width=400)  # Ajuster la largeur ici
+        st.image("assets/image2.jpg", caption="Gestion Intelligente", width=500)  # Ajuster la largeur ici
 
     # Fonctionnalité 3: Agriculture Durable
     st.markdown("### 🌱 Agriculture Durable")

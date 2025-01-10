@@ -8,10 +8,9 @@ def calculate_soil_moisture_and_vegetation_index(lat=45.7, long=3.1, start="2025
     data = get_weather_climate(lat, long, start, end)
     
     df = pd.DataFrame({
-            'Date': data['Date'],
-            'Humidité du sol': data['Précipitations Moyenne (mm)'] - (data['Température Max (°C)'] - data['Température Min (°C)']),
-            'Indice de végétation': (data['Précipitations Moyenne (mm)'] * (data['Température Max (°C)'] - data['Température Min (°C)'])) / data['Température Max (°C)'],
+        'Date': data['Date'],
+        'Humidité du sol': data.apply(lambda row: max(0, row['Précipitations Moyenne (mm)'] - 0.6 * row['Température Moyenne (°C)']), axis=1),
+        'Indice de végétation': data.apply(lambda row: max(0, min(1, 0.5 + 0.05 * (row['Précipitations Moyenne (mm)'] - 10) - 0.02 * (row['Température Moyenne (°C)'] - 25))), axis=1)
     })
-
     return df
 

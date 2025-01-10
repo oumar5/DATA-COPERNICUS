@@ -93,7 +93,7 @@ def load_culture_info(fruit_type):
 
 def show():
     set_green_theme()
-    st.title("Récommandtions d'irrigation")
+    st.title("Recommandtions d'irrigation")
     st.write("Analyse climatique pour une région donnée.")
 
     fruit_choice = st.selectbox("Sélectionnez un fruit", ["Pommier", "Poiriers", "Cerisiers", "Autre"])
