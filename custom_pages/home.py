@@ -1,26 +1,69 @@
 import streamlit as st
 
 def show():
-    """
-    Affiche la page d'accueil de l'application.
-    """
-    st.title("Bienvenue sur HydroSense 🌍")
+    # En-tête
+    st.markdown("# 🌍 HydroSense")
+    st.markdown("Optimisez votre irrigation pour une agriculture durable")
+    
+    # Cartes des fonctionnalités principales
+    st.markdown("## Fonctionnalités principales")
 
+    # Créer deux colonnes pour afficher les images côte à côte
+    col1, col2 = st.columns(2)
+
+    # Fonctionnalité 1: Analyse Précise avec image
+    with col1:
+        st.markdown("### 📊 Analyse Précise")
+        st.markdown("""
+            Accédez à des données climatiques fiables et des analyses détaillées pour prendre les meilleures décisions.
+        """)
+        # Définir la taille fixe pour l'image
+        st.image("assets/image4.jpg", caption="Analyse Précise", width=400)  # Ajuster la largeur ici
+
+    # Fonctionnalité 2: Gestion Intelligente avec image
+    with col2:
+        st.markdown("### 💧 Gestion Intelligente")
+        st.markdown("""
+            Optimisez votre consommation d'eau grâce à nos recommandations personnalisées basées sur l'IA.
+        """)
+        # Définir la même taille fixe pour l'image
+        st.image("assets/image2.jpg", caption="Gestion Intelligente", width=400)  # Ajuster la largeur ici
+
+    # Fonctionnalité 3: Agriculture Durable
+    st.markdown("### 🌱 Agriculture Durable")
     st.markdown("""
-        ### Gérez efficacement l'eau en agriculture !
-        HydroSense est une application innovante qui vous accompagne dans la gestion de l'eau pour une agriculture durable.
-
-        Grâce à l'analyse des données climatiques, cette application vous offre :
-        - Une surveillance précise des conditions de sol.
-        - Des recommandations personnalisées d'irrigation.
-        - Une analyse climatique simplifiée pour anticiper vos besoins.
-
-        #### Pourquoi utiliser HydroSense ?
-        - **Précision** : Les recommandations s'appuient sur des données climatiques fiables.
-        - **Simplicité** : Une interface intuitive pour un accès rapide à l'information.
-        - **Durabilité** : Aidez à préserver les ressources en eau en optimisant leur utilisation.
-
-        **Utilisez le menu à gauche pour naviguer dans les différentes fonctionnalités de l'application.** 🌱
+        Contribuez à la préservation des ressources tout en maximisant vos rendements agricoles.
     """)
 
-    st.info("Astuce : Consultez les recommandations quotidiennes pour planifier votre irrigation efficacement.")
+    # Section des avantages avec métriques
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric(label="Économie d'eau", value="30%", delta="vs méthodes traditionnelles")
+    with col2:
+        st.metric(label="Précision", value="95%", delta="fiabilité des données")
+    with col3:
+        st.metric(label="Productivité", value="+25%", delta="rendement agricole")
+
+    # Bandeau d'astuce animé
+    st.markdown("""
+        💡 <strong>Astuce du jour :</strong> Consultez nos recommandations quotidiennes d'irrigation 
+        pour optimiser votre consommation d'eau en fonction des prévisions météorologiques.
+    """)
+
+    # Section "Pour commencer" avec des étapes
+    st.markdown("### 🚀 Pour commencer")
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.info("""
+            1. Sélectionnez votre parcelle sur la carte
+            2. Analysez les données climatiques
+            3. Suivez nos recommandations personnalisées
+        """)
+    
+    with col2:
+        st.success("""
+            **Besoin d'aide ?**
+            
+            Consultez notre guide d'utilisation ou contactez notre équipe support pour un accompagnement personnalisé.
+        """)

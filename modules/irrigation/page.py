@@ -92,19 +92,11 @@ def load_culture_info(fruit_type):
 
 
 def show():
-    """
-    Affiche la page principale pour calculer les indices et les recommandations.
-    """
     set_green_theme()
-    st.title("Indice de Végétation et Humidité du Sol")
+    st.title("Récommandtions d'irrigation")
     st.write("Analyse climatique pour une région donnée.")
 
-    # Ajout du sélecteur de fruit
-    fruit_choice = st.selectbox(
-        "Sélectionnez un fruit",
-        ["Pommier", "Poiriers", "Cerisiers", "Autre"]
-    )
-
+    fruit_choice = st.selectbox("Sélectionnez un fruit", ["Pommier", "Poiriers", "Cerisiers", "Autre"])
     st.info("Les coordonnées par défaut sont centrées sur la région Auvergne-Rhône-Alpes.")
     lat = st.number_input("Latitude", value=45.764043, format="%.6f")
     lon = st.number_input("Longitude", value=4.835659, format="%.6f")
@@ -119,7 +111,7 @@ def show():
 
     if isinstance(date_range, tuple) and len(date_range) == 2:
         start_date, end_date = date_range
-        num_days = (end_date - start_date).days + 1  # Calcul du nombre de jours dans la plage
+        num_days = (end_date - start_date).days + 1
     else:
         st.error("Veuillez sélectionner une plage de dates valide.")
         st.stop()
@@ -141,23 +133,21 @@ def show():
                 st.error(f"Erreur lors de la prédiction : {str(e)}")
                 st.stop()
 
-        # Extraire les prévisions
         temp_values = [day["temp"] for day in future_climate_data]
         precip_values = [day["precip"] for day in future_climate_data]
         time_labels = [(start_date + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(num_days)]
 
         indices_list = calculate_indices(temp_values, precip_values)
-        culture_info = load_culture_info(fruit_choice)  # Utilisation du fruit sélectionné
+        culture_info = load_culture_info(fruit_choice)
         soil_info = get_soil_info(lat, lon)
-
         recommendations = []
         for idx, (temp, precip, indices) in enumerate(zip(temp_values, precip_values, indices_list)):
             rec = generate_recommendation(soil_info, indices, temp, precip, culture_info)
             recommendations.append(rec)
 
-        # Extraire les besoins quotidiens en eau à partir des recommandations
-        daily_water_needs = [rec['daily_need_l_per_m2'] for rec in recommendations]
+        # Calculer manque_water_needs après avoir rempli recommendations
+        manque_water_needs = [rec['manque_l_per_m2'] for rec in recommendations] if recommendations else [0] * num_days
 
-        # Appel de la fonction avec les besoins quotidiens
-        display_climate_indices(indices_list, time_labels, temp_values, precip_values, daily_water_needs)
+
+        display_climate_indices(indices_list, time_labels, temp_values, precip_values, manque_water_needs)
         display_recommendation(recommendations)

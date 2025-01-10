@@ -3,7 +3,8 @@ from custom_pages import home, about
 from modules.soil_monitoring.page import show as show_soil_monitoring
 from modules.irrigation.page import show as show_irrigation
 from modules.climatic_analysis.page import show as show_climatic_analysis
-
+# Configuration de la page Streamlit
+st.set_page_config(layout="wide", page_title="Application Agriculture")
 # Configuration de la barre latérale pour la navigation
 st.sidebar.title("Navigation")
 page = st.sidebar.radio(

@@ -164,6 +164,9 @@ def generate_recommendation(soil_info, indices, temp_pred, precip_pred, culture_
     daily_need_mm = culture_info["besoin_eau_semaine"] / 7  # Besoin journalier en mm/jour
     daily_need_l_per_m2 = daily_need_mm  # Conversion directe mm -> litres/m²
 
+    # Initialisation du manque en eau par défaut
+    manque_l_per_m2 = 0
+
     # Calcul des besoins supplémentaires en irrigation
     if precip_pred < daily_need_mm:  # Précipitations insuffisantes
         manque_mm = daily_need_mm - precip_pred  # Besoin supplémentaire en mm
@@ -187,7 +190,8 @@ def generate_recommendation(soil_info, indices, temp_pred, precip_pred, culture_
         },
         "daily_need_l_per_m2": round(daily_need_l_per_m2, 2),
         "soil_moisture": round(soil_moisture, 2),
-        "irrigation_message": irrigation_message
+        "irrigation_message": irrigation_message,
+        "manque_l_per_m2": round(manque_l_per_m2, 2),  # Ajout du manque
     }
 
     return recommendation

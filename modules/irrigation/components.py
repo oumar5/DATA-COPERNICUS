@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def display_climate_indices(indices_list, time_labels, temp_values, precip_values, daily_water_needs):
+def display_climate_indices(indices_list, time_labels, temp_values, precip_values, manque_water_needs):
     """
     Affiche les indices climatiques, la température, la précipitation et le besoin en eau sous forme de graphiques séparés.
 
@@ -57,13 +57,13 @@ def display_climate_indices(indices_list, time_labels, temp_values, precip_value
     ax3.legend(loc="upper left")
     st.pyplot(fig3)
 
-    # ----- Graphique : Besoin en eau -----
-    st.write("### Évolution du besoin en eau quotidien")
+    # ----- Graphique : Manque en eau -----
+    st.write("### Évolution du manque en eau quotidien")
     fig4, ax4 = plt.subplots(figsize=(10, 5))
-    ax4.plot(time_labels, daily_water_needs, marker='o', color='purple', label="Besoin en Eau (L/m²)")
+    ax4.plot(time_labels, manque_water_needs, marker='o', color='purple', label="Manque en Eau (L/m²)")
     ax4.set_xlabel("Temps", fontsize=12)
-    ax4.set_ylabel("Besoin en Eau (L/m²)", fontsize=12, color="purple")
-    ax4.set_title("Variation du besoin en eau quotidien", fontsize=14)
+    ax4.set_ylabel("Manque en Eau (L/m²)", fontsize=12, color="purple")
+    ax4.set_title("Variation du manque en eau quotidien", fontsize=14)
     ax4.tick_params(axis='x', rotation=45)
     ax4.grid(True, linestyle='--', alpha=0.6)
     ax4.legend(loc="upper left")
@@ -76,7 +76,7 @@ def display_recommendation(recommendations):
 
     - recommendations (list): Liste des recommandations, chaque élément étant un dictionnaire structuré.
     """
-    st.markdown("<h3 style='color:#2c3e50;'>Recommandations d'Irrigation</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color:#2c3e50;'>Récommandations d'Irrigation</h3>", unsafe_allow_html=True)
 
     # Préparation des données pour le tableau
     table_data = []
